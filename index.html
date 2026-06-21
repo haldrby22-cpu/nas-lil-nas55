@@ -2,47 +2,53 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>الناس للناس - لوحة الإدارة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>الناس للناس - الإدارة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Cairo', sans-serif; background: #f8f9fa; margin: 0; padding: 20px; }
-        .box { background: white; padding: 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); text-align: center; }
-        .btn { background: #27ae60; color: white; border: none; padding: 10px 20px; cursor: pointer; border-radius: 5px; margin-top: 10px; }
-        input { padding: 8px; margin: 5px; border: 1px solid #ddd; border-radius: 5px; width: 80%; }
+        :root { --primary: #2c3e50; --secondary: #27ae60; --light: #f4f7f6; }
+        body { font-family: 'Tajawal', sans-serif; background: var(--light); margin: 0; padding: 20px; display: flex; justify-content: center; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
+        h1 { color: var(--primary); margin-bottom: 5px; }
+        p { color: #7f8c8d; margin-bottom: 20px; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; transition: 0.3s; }
+        input:focus { border-color: var(--secondary); outline: none; }
+        .btn { width: 100%; background: var(--secondary); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        .btn:hover { background: #219150; }
+        #app { display: none; width: 100%; max-width: 500px; }
+        .admin-header { background: var(--primary); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" class="box">
-        <h1 style="color: #2c3e50;">الناس للناس</h1>
-        <h2>تسجيل الدخول</h2>
-        <input type="text" id="user" placeholder="اسم المستخدم"><br>
-        <input type="password" id="pass" placeholder="كلمة المرور"><br>
+    <div id="loginScreen" class="card">
+        <h1>الناس للناس</h1>
+        <p>مرحباً بك في لوحة الإدارة</p>
+        <input type="text" id="user" placeholder="اسم المستخدم">
+        <input type="password" id="pass" placeholder="كلمة المرور">
         <button class="btn" onclick="login()">دخول</button>
     </div>
 
-    <div id="app" style="display:none;">
-        <div class="box">
-            <h1>الناس للناس</h1>
-            <h3>رئيس مجلس الإدارة: الأستاذ/ شعبان عبد الفضيل</h3>
-        </div>
-
-        <div class="box">
-            <h3>إضافة مستخدم جديد</h3>
-            <input type="text" id="newU" placeholder="اسم المستخدم الجديد">
-            <input type="password" id="newP" placeholder="كلمة المرور">
-            <button class="btn" style="background:#34495e;" onclick="saveUser()">حفظ مستخدم جديد</button>
-        </div>
-
-        <div class="box">
-            <h3>إضافة حالة جديدة</h3>
-            <input type="text" id="taskInput" placeholder="اسم الحالة">
-            <button class="btn" onclick="addTask()">إضافة</button>
+    <div id="app" class="card">
+        <div class="admin-header">
+            <h3>الناس للناس</h3>
+            <small>رئيس مجلس الإدارة: الأستاذ/ شعبان عبد الفضيل</small>
         </div>
         
-        <footer style="text-align:center; margin-top: 30px;">
-            <p>تم التطوير بواسطة: <strong>حسن الدربي</strong></p>
-        </footer>
+        <div style="text-align: right;">
+            <h4>إضافة مستخدم جديد</h4>
+            <input type="text" id="newU" placeholder="اسم المستخدم">
+            <input type="password" id="newP" placeholder="كلمة المرور">
+            <button class="btn" onclick="saveUser()">حفظ المستخدم</button>
+            
+            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+            
+            <h4>إضافة حالة جديدة</h4>
+            <input type="text" id="taskInput" placeholder="اسم الحالة...">
+            <button class="btn" style="background:var(--primary);" onclick="addTask()">إضافة الحالة</button>
+        </div>
+        
+        <p style="margin-top:30px; font-size: 0.8em;">تطوير: حسن الدربي</p>
     </div>
 
     <script type="module">
@@ -62,8 +68,8 @@
             const u = document.getElementById('user').value;
             const p = document.getElementById('pass').value;
             const q = query(collection(db, "users"), where("username", "==", u), where("password", "==", p));
-            const querySnapshot = await getDocs(q);
-            if (!querySnapshot.empty) {
+            const snapshot = await getDocs(q);
+            if (!snapshot.empty) {
                 document.getElementById('loginScreen').style.display = 'none';
                 document.getElementById('app').style.display = 'block';
             } else { alert("بيانات خاطئة!"); }
@@ -71,11 +77,12 @@
 
         window.saveUser = async () => {
             await addDoc(collection(db, "users"), { username: document.getElementById('newU').value, password: document.getElementById('newP').value });
-            alert("تم حفظ المستخدم الجديد!");
+            alert("تم حفظ المستخدم!");
         };
 
         window.addTask = () => {
             addDoc(collection(db, "tasks"), { name: document.getElementById('taskInput').value, status: "قيد الانتظار" });
+            alert("تمت الإضافة!");
         };
     </script>
 </body>
