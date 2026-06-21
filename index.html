@@ -4,21 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الناس للناس - لوحة الإدارة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2c3e50; --secondary: #27ae60; --light: #f4f7f6; }
-        body { font-family: 'Tajawal', sans-serif; background: var(--light); margin: 0; padding: 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 400px; text-align: center; }
-        input { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; background: var(--secondary); color: white; border: none; border-radius: 10px; cursor: pointer; font-weight: bold; }
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: center; }
+        .card { background: white; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
+        .btn { padding: 12px 30px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
         #app { display: none; }
     </style>
 </head>
 <body>
 
     <div id="loginScreen" class="card">
-        <h1>الناس للناس</h1>
-        <p>لوحة تحكم الإدارة</p>
+        <h1>تسجيل الدخول</h1>
         <input type="text" id="user" placeholder="اسم المستخدم">
         <input type="password" id="pass" placeholder="كلمة المرور">
         <button class="btn" onclick="login()">دخول</button>
@@ -26,7 +23,7 @@
 
     <div id="app" class="card">
         <h1>تم الدخول بنجاح!</h1>
-        <p>أهلاً بك في لوحة التحكم.</p>
+        <p>أهلاً بك في لوحة تحكم الناس للناس.</p>
     </div>
 
     <script type="module">
@@ -47,30 +44,26 @@
             const p = document.getElementById('pass').value.trim();
             
             try {
-                // جلب جميع المستندات من مجموعة 'users'
-                const snapshot = await getDocs(collection(db, "users"));
-                let authenticated = false;
+                // جلب كل البيانات من مجموعة users
+                const querySnapshot = await getDocs(collection(db, "users"));
+                let found = false;
 
-                snapshot.forEach((doc) => {
+                querySnapshot.forEach((doc) => {
                     const data = doc.data();
-                    // فحص مرن جداً (يدعم اسم الحقل بحرف كبير أو صغير)
-                    const dbUser = data.username || data.Username;
-                    const dbPass = data.password || data.Password;
-
-                    if (dbUser === u && dbPass === p) {
-                        authenticated = true;
+                    // مطابقة دقيقة
+                    if (data.username === u && data.password === p) {
+                        found = true;
                     }
                 });
 
-                if (authenticated) {
+                if (found) {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('app').style.display = 'block';
                 } else {
                     alert("بيانات خاطئة! يرجى التأكد من اسم المستخدم وكلمة المرور.");
                 }
             } catch (e) {
-                console.error(e);
-                alert("حدث خطأ في الاتصال بقاعدة البيانات. تأكد من إعداداتك.");
+                alert("خطأ في الاتصال: " + e.message);
             }
         };
     </script>
