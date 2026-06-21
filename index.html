@@ -2,19 +2,22 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الناس للناس - لوحة الإدارة</title>
     <style>
         body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: center; }
-        .card { background: white; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
-        .btn { padding: 12px 30px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+        .card { background: white; padding: 30px; border-radius: 20px; max-width: 400px; margin: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; }
         #app { display: none; }
+        .footer { margin-top: 20px; color: #777; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
     <div id="loginScreen" class="card">
-        <h1>تسجيل الدخول</h1>
+        <h1>الناس للناس</h1>
+        <p>لوحة تحكم الإدارة</p>
         <input type="text" id="user" placeholder="اسم المستخدم">
         <input type="password" id="pass" placeholder="كلمة المرور">
         <button class="btn" onclick="login()">دخول</button>
@@ -22,13 +25,16 @@
 
     <div id="app" class="card">
         <h1>تم الدخول بنجاح!</h1>
-        <p>رئيس مجلس الإدارة: الأستاذ/ شعبان عبد الفضيل</p>
-        <p>تطوير: حسن الدربي</p>
+        <hr>
+        <p><strong>رئيس مجلس الإدارة:</strong> الأستاذ/ شعبان عبد الفضيل</p>
+        <div class="footer">
+            <p>تطوير: حسن الدربي</p>
+        </div>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, getDocs, query, where } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const db = getFirestore(initializeApp({
             apiKey: "AIzaSyCdEd_xy-BBtxRm8CmIRyS1Ublr-Kp5fAQ",
@@ -43,18 +49,26 @@
             const p = document.getElementById('pass').value.trim();
             
             try {
-                const q = query(collection(db, "users"), where("username", "==", u), where("password", "==", p));
-                const snapshot = await getDocs(q);
-                
-                if (!snapshot.empty) {
+                const snapshot = await getDocs(collection(db, "users"));
+                let isMatch = false;
+
+                snapshot.forEach((doc) => {
+                    const data = doc.data();
+                    // نجمع كل قيم الحقول في المستند للبحث عن المستخدم وكلمة المرور
+                    const values = Object.values(data).map(v => String(v).trim());
+                    if (values.includes(u) && values.includes(p)) {
+                        isMatch = true;
+                    }
+                });
+
+                if (isMatch) {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('app').style.display = 'block';
                 } else {
                     alert("بيانات خاطئة! يرجى التأكد من اسم المستخدم وكلمة المرور.");
                 }
             } catch (e) {
-                console.error(e);
-                alert("حدث خطأ في الاتصال، تأكد من إعدادات قواعد البيانات (Rules).");
+                alert("خطأ في الاتصال: " + e.message);
             }
         };
     </script>
