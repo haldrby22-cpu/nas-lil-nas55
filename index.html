@@ -18,6 +18,7 @@
 </head>
 <body>
 
+    <!-- شاشة الدخول -->
     <div id="loginScreen" class="card">
         <h1>الناس للناس</h1>
         <p>لوحة تحكم الإدارة</p>
@@ -26,6 +27,7 @@
         <button class="btn" onclick="login()">دخول</button>
     </div>
 
+    <!-- لوحة التحكم -->
     <div id="app" class="card">
         <div class="admin-header">
             <h3>الناس للناس</h3>
@@ -61,13 +63,16 @@
             appId: "1:134740212500:web:af95ff96b87bd6b2f66001"
         }));
 
+        // دالة تسجيل الدخول
         window.login = async () => {
             const u = document.getElementById('user').value.trim();
             const p = document.getElementById('pass').value.trim();
             
             try {
+                // استعلام للتأكد من وجود المستخدم
                 const q = query(collection(db, "users"), where("username", "==", u), where("password", "==", p));
                 const snapshot = await getDocs(q);
+                
                 if (!snapshot.empty) {
                     document.getElementById('loginScreen').style.display = 'none';
                     document.getElementById('app').style.display = 'block';
@@ -75,10 +80,12 @@
                     alert("بيانات خاطئة! يرجى التأكد من اسم المستخدم وكلمة المرور.");
                 }
             } catch (e) {
-                alert("خطأ في الاتصال بقاعدة البيانات.");
+                console.error(e);
+                alert("حدث خطأ في الاتصال، تأكد من إعدادات قاعدة البيانات.");
             }
         };
 
+        // دالة حفظ مستخدم جديد
         window.saveUser = async () => {
             const u = document.getElementById('newU').value.trim();
             const p = document.getElementById('newP').value.trim();
@@ -88,11 +95,12 @@
             }
         };
 
+        // دالة إضافة حالة
         window.addTask = () => {
-            const task = document.getElementById('taskInput').value;
+            const task = document.getElementById('taskInput').value.trim();
             if(task) {
                 addDoc(collection(db, "tasks"), { name: task, status: "قيد الانتظار" });
-                alert("تمت الإضافة!");
+                alert("تمت إضافة الحالة بنجاح!");
             }
         };
     </script>
