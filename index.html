@@ -3,70 +3,69 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الناس للناس - الإدارة</title>
+    <title>الناس للناس | الإدارة الاحترافية</title>
+    <!-- المكتبات الاحترافية -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; min-height: 100vh; }
-        .banner { width: 100%; background: linear-gradient(to right, #2c3e50, #4ca1af); color: white; text-align: center; padding: 20px 0; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
-        .banner h1 { font-size: 2.5em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
-        .banner-info { display: flex; justify-content: center; gap: 40px; margin-top: 15px; font-size: 1.1em; }
-        .name-highlight { color: #f1c40f; font-weight: bold; }
-        .container { padding: 20px; }
-        .wrapper { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1200px; margin: auto; }
-        .sidebar { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; }
-        .main-content { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        :root { --primary: #1a2a6c; --danger: #e74c3c; --bg: #f4f7f6; }
+        body { font-family: 'Tajawal', sans-serif; background-color: var(--bg); margin: 0; }
+        .header { background: linear-gradient(135deg, var(--primary), #b21f1f); color: white; padding: 20px; text-align: center; }
+        .container { max-width: 1200px; margin: 10px auto; padding: 0 15px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: 350px 1fr; gap: 20px; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; border: 1px solid #eee; text-align: center; }
-        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; background: #27ae60; color: white; font-weight: bold; }
-        .btn-del { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
-        @media (max-width: 768px) { .wrapper { grid-template-columns: 1fr; } .banner-info { flex-direction: column; gap: 5px; } }
+        .btn { padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; color: white; font-weight: bold; margin: 5px; }
+        .btn-main { background: var(--primary); }
+        .btn-del { background: var(--danger); }
         #app { display: none; }
+        
+        @media print { .btn, .header, aside, .card h3, .card:nth-child(1) { display: none !important; } }
     </style>
 </head>
 <body>
 
-<div class="banner">
-    <h1>الـنـاس لـلـنـاس</h1>
-    <div class="banner-info">
-        <span>رئيس مجلس الإدارة: <span class="name-highlight">الأستاذ/ شعبان عبد الفضيل</span></span>
-        <span>تطوير: <span class="name-highlight">حسن الدربي</span></span>
-    </div>
-</div>
+<div class="header"><h1>مؤسسة الناس للناس</h1><p>تطوير/ حسن الدربي</p></div>
 
 <div class="container">
-    <div id="loginScreen" style="max-width: 400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
-        <h3 style="text-align:center;">دخول الإدارة</h3>
-        <input type="text" id="user" placeholder="اسم المستخدم">
-        <input type="password" id="pass" placeholder="كلمة المرور">
-        <button class="btn" style="background:#2c3e50;" onclick="login()">دخول</button>
+    <!-- تسجيل الدخول -->
+    <div id="loginScreen" class="card" style="max-width: 400px; margin: auto;">
+        <h3>دخول الإدارة</h3>
+        <input type="text" id="user" placeholder="اسم المستخدم" style="width:100%; padding:10px; margin:5px 0; border:1px solid #ddd; border-radius:8px;">
+        <input type="password" id="pass" placeholder="كلمة المرور" style="width:100%; padding:10px; margin:5px 0; border:1px solid #ddd; border-radius:8px;">
+        <button class="btn btn-main" style="width:100%" onclick="login()">دخول إلى النظام</button>
     </div>
 
-    <div id="app" class="wrapper">
-        <aside class="sidebar">
-            <h3 style="color:#2c3e50;">الإحصائيات</h3>
-            <p>الرصيد: <b id="balance" style="font-size: 1.4em; color:#27ae60; display:block;">0</b> ج.م</p>
-            <p>التبرعات: <span id="totalIn">0</span></p>
-            <p>المنصرف: <span id="totalOut">0</span></p>
+    <!-- لوحة التحكم -->
+    <div id="app" class="grid">
+        <aside>
+            <div class="card">
+                <h3>المؤشرات المالية</h3>
+                <canvas id="myChart"></canvas>
+                <h2 id="balance" style="text-align:center; color: var(--primary);">0</h2>
+            </div>
         </aside>
-
         <main>
-            <div class="main-content">
-                <h3>إدارة الحركات المالية</h3>
-                <input type="text" id="cName" placeholder="اسم الحالة">
-                <input type="number" id="amount" placeholder="المبلغ">
-                <select id="type"><option value="in">تبرع (وارد)</option><option value="out">صرف (صادر)</option></select>
-                <button class="btn" onclick="saveData()">حفظ الحركة</button>
-
-                <table>
-                    <thead><tr><th>الاسم</th><th>المبلغ</th><th>النوع</th><th>الإجراء</th></tr></thead>
+            <div class="card">
+                <h3>إضافة حركة مالية</h3>
+                <input type="text" id="cName" placeholder="اسم الحالة" style="width:100%; padding:10px; margin:5px 0;">
+                <input type="number" id="amount" placeholder="المبلغ" style="width:100%; padding:10px; margin:5px 0;">
+                <select id="type" style="width:100%; padding:10px; margin:5px 0;">
+                    <option value="in">تبرع (وارد)</option><option value="out">صرف (صادر)</option>
+                </select>
+                <button class="btn btn-main" style="width:100%" onclick="saveData()">حفظ العملية</button>
+            </div>
+            <div class="card">
+                <button class="btn btn-main" onclick="exportExcel()">Excel</button>
+                <button class="btn btn-main" style="background:#2c3e50" onclick="window.print()">طباعة السجل</button>
+                <table id="financeTable">
+                    <thead><tr><th>الاسم</th><th>المبلغ</th><th>النوع</th><th>إجراء</th></tr></thead>
                     <tbody id="tableBody"></tbody>
                 </table>
-            </div>
-
-            <div class="main-content">
-                <h3>تغيير كلمة المرور</h3>
-                <input type="password" id="newPass" placeholder="كلمة المرور الجديدة">
-                <button class="btn" style="background:#f39c12;" onclick="changePassword()">تحديث كلمة المرور</button>
             </div>
         </main>
     </div>
@@ -74,7 +73,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
     const db = getFirestore(initializeApp({
         apiKey: "AIzaSyCdEd_xy-BBtxRm8CmIRyS1Ublr-Kp5fAQ",
@@ -84,59 +83,61 @@
         appId: "1:134740212500:web:af95ff96b87bd6b2f66001"
     }));
 
+    let myChart = null;
+
     window.login = async () => {
         const u = document.getElementById('user').value.trim();
         const p = document.getElementById('pass').value.trim();
         const snap = await getDocs(collection(db, "users"));
         let auth = false;
         snap.forEach(d => { if(d.data().username === u && d.data().password === p) auth = true; });
-        if (auth) {
+        if(auth) {
             document.getElementById('loginScreen').style.display = 'none';
             document.getElementById('app').style.display = 'grid';
             loadData();
-        } else { alert("بيانات الدخول خاطئة!"); }
+        } else { Swal.fire('خطأ', 'بيانات الدخول غير صحيحة', 'error'); }
     };
 
     window.saveData = async () => {
         const name = document.getElementById('cName').value;
         const amount = parseFloat(document.getElementById('amount').value);
         const type = document.getElementById('type').value;
-        if(!name || !amount) return alert("يرجى ملء البيانات");
-        await addDoc(collection(db, "finance"), { name, amount, type });
+        await addDoc(collection(db, "finance"), { name, amount, type, timestamp: Date.now() });
+        Swal.fire('تم الحفظ', 'تم إضافة الحركة بنجاح', 'success');
         loadData();
     };
 
-    window.deleteRow = async (id) => {
-        await deleteDoc(doc(db, "finance", id));
-        loadData();
+    window.deleteRow = (id) => {
+        Swal.fire({ title: 'هل أنت متأكد؟', icon: 'warning', showCancelButton: true, confirmButtonText: 'نعم، احذف', cancelButtonText: 'إلغاء' })
+        .then(async (r) => { if(r.isConfirmed) { await deleteDoc(doc(db, "finance", id)); loadData(); } });
     };
 
-    window.changePassword = async () => {
-        const newP = document.getElementById('newPass').value;
-        const u = document.getElementById('user').value.trim();
-        const snap = await getDocs(collection(db, "users"));
-        snap.forEach(async (d) => {
-            if (d.data().username === u) {
-                await updateDoc(doc(db, "users", d.id), { password: newP });
-                alert("تم تحديث كلمة المرور!");
-            }
-        });
+    window.exportExcel = () => {
+        let url = 'data:application/vnd.ms-excel,' + encodeURIComponent(document.getElementById("financeTable").outerHTML);
+        let link = document.createElement("a");
+        link.download = "سجل_المؤسسة.xls"; link.href = url; link.click();
     };
 
     async function loadData() {
         const snap = await getDocs(collection(db, "finance"));
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = "";
-        let inTotal = 0, outTotal = 0;
+        let docs = [], inT = 0, outT = 0;
         snap.forEach(d => {
             const data = d.data();
-            if(data.type === 'in') inTotal += data.amount; else outTotal += data.amount;
-            tbody.innerHTML += `<tr><td>${data.name}</td><td>${data.amount}</td><td>${data.type}</td>
-                <td><button class="btn-del" onclick="deleteRow('${d.id}')">حذف</button></td></tr>`;
+            docs.push({ id: d.id, ...data });
+            if(data.type === 'in') inT += data.amount; else outT += data.amount;
         });
-        document.getElementById('totalIn').innerText = inTotal;
-        document.getElementById('totalOut').innerText = outTotal;
-        document.getElementById('balance').innerText = inTotal - outTotal;
+        docs.sort((a,b) => b.timestamp - a.timestamp);
+
+        const ctx = document.getElementById('myChart').getContext('2d');
+        if(myChart) myChart.destroy();
+        myChart = new Chart(ctx, { type: 'doughnut', data: { labels: ['وارد', 'صادر'], datasets: [{ data: [inT, outT], backgroundColor: ['#27ae60', '#e74c3c'] }] } });
+
+        document.getElementById('balance').innerText = `الرصيد: ${inT - outT}`;
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        docs.forEach(d => {
+            tbody.innerHTML += `<tr><td>${d.name}</td><td>${d.amount}</td><td>${d.type}</td><td><button class="btn btn-del" onclick="deleteRow('${d.id}')">حذف</button></td></tr>`;
+        });
     }
 </script>
 </body>
