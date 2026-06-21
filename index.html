@@ -3,74 +3,141 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الناس للناس - لوحة الإدارة</title>
+    <title>الناس للناس - الإدارة</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: center; }
-        .card { background: white; padding: 30px; border-radius: 20px; max-width: 400px; margin: auto; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
-        input { width: 100%; padding: 15px; margin: 10px 0; border: 1px solid #ddd; border-radius: 10px; box-sizing: border-box; }
-        .btn { width: 100%; padding: 15px; background: #27ae60; color: white; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; margin: 0; min-height: 100vh; }
+        .banner { width: 100%; background: linear-gradient(to right, #2c3e50, #4ca1af); color: white; text-align: center; padding: 20px 0; margin-bottom: 30px; box-shadow: 0 4px 10px rgba(0,0,0,0.2); }
+        .banner h1 { font-size: 2.5em; margin: 0; text-shadow: 2px 2px 4px rgba(0,0,0,0.3); }
+        .banner-info { display: flex; justify-content: center; gap: 40px; margin-top: 15px; font-size: 1.1em; }
+        .name-highlight { color: #f1c40f; font-weight: bold; }
+        .container { padding: 20px; }
+        .wrapper { display: grid; grid-template-columns: 300px 1fr; gap: 20px; max-width: 1200px; margin: auto; }
+        .sidebar { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); height: fit-content; }
+        .main-content { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); margin-bottom: 20px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { padding: 12px; border: 1px solid #eee; text-align: center; }
+        input, select { width: 100%; padding: 12px; margin: 8px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        .btn { width: 100%; padding: 12px; border: none; border-radius: 8px; cursor: pointer; background: #27ae60; color: white; font-weight: bold; }
+        .btn-del { background: #e74c3c; color: white; border: none; padding: 5px 10px; border-radius: 8px; cursor: pointer; }
+        @media (max-width: 768px) { .wrapper { grid-template-columns: 1fr; } .banner-info { flex-direction: column; gap: 5px; } }
         #app { display: none; }
-        .footer { margin-top: 20px; color: #777; font-size: 0.9em; }
     </style>
 </head>
 <body>
 
-    <div id="loginScreen" class="card">
-        <h1>الناس للناس</h1>
-        <p>لوحة تحكم الإدارة</p>
+<div class="banner">
+    <h1>الـنـاس لـلـنـاس</h1>
+    <div class="banner-info">
+        <span>رئيس مجلس الإدارة: <span class="name-highlight">الأستاذ/ شعبان عبد الفضيل</span></span>
+        <span>تطوير: <span class="name-highlight">حسن الدربي</span></span>
+    </div>
+</div>
+
+<div class="container">
+    <div id="loginScreen" style="max-width: 400px; margin: auto; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 15px rgba(0,0,0,0.1);">
+        <h3 style="text-align:center;">دخول الإدارة</h3>
         <input type="text" id="user" placeholder="اسم المستخدم">
         <input type="password" id="pass" placeholder="كلمة المرور">
-        <button class="btn" onclick="login()">دخول</button>
+        <button class="btn" style="background:#2c3e50;" onclick="login()">دخول</button>
     </div>
 
-    <div id="app" class="card">
-        <h1>تم الدخول بنجاح!</h1>
-        <hr>
-        <p><strong>رئيس مجلس الإدارة:</strong> الأستاذ/ شعبان عبد الفضيل</p>
-        <div class="footer">
-            <p>تطوير: حسن الدربي</p>
-        </div>
+    <div id="app" class="wrapper">
+        <aside class="sidebar">
+            <h3 style="color:#2c3e50;">الإحصائيات</h3>
+            <p>الرصيد: <b id="balance" style="font-size: 1.4em; color:#27ae60; display:block;">0</b> ج.م</p>
+            <p>التبرعات: <span id="totalIn">0</span></p>
+            <p>المنصرف: <span id="totalOut">0</span></p>
+        </aside>
+
+        <main>
+            <div class="main-content">
+                <h3>إدارة الحركات المالية</h3>
+                <input type="text" id="cName" placeholder="اسم الحالة">
+                <input type="number" id="amount" placeholder="المبلغ">
+                <select id="type"><option value="in">تبرع (وارد)</option><option value="out">صرف (صادر)</option></select>
+                <button class="btn" onclick="saveData()">حفظ الحركة</button>
+
+                <table>
+                    <thead><tr><th>الاسم</th><th>المبلغ</th><th>النوع</th><th>الإجراء</th></tr></thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="main-content">
+                <h3>تغيير كلمة المرور</h3>
+                <input type="password" id="newPass" placeholder="كلمة المرور الجديدة">
+                <button class="btn" style="background:#f39c12;" onclick="changePassword()">تحديث كلمة المرور</button>
+            </div>
+        </main>
     </div>
+</div>
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, getDocs, addDoc, deleteDoc, doc, updateDoc } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
-        const db = getFirestore(initializeApp({
-            apiKey: "AIzaSyCdEd_xy-BBtxRm8CmIRyS1Ublr-Kp5fAQ",
-            projectId: "al-nas-lil-nas",
-            storageBucket: "al-nas-lil-nas.firebasestorage.app",
-            messagingSenderId: "134740212500",
-            appId: "1:134740212500:web:af95ff96b87bd6b2f66001"
-        }));
+    const db = getFirestore(initializeApp({
+        apiKey: "AIzaSyCdEd_xy-BBtxRm8CmIRyS1Ublr-Kp5fAQ",
+        projectId: "al-nas-lil-nas",
+        storageBucket: "al-nas-lil-nas.firebasestorage.app",
+        messagingSenderId: "134740212500",
+        appId: "1:134740212500:web:af95ff96b87bd6b2f66001"
+    }));
 
-        window.login = async () => {
-            const u = document.getElementById('user').value.trim();
-            const p = document.getElementById('pass').value.trim();
-            
-            try {
-                const snapshot = await getDocs(collection(db, "users"));
-                let isMatch = false;
+    window.login = async () => {
+        const u = document.getElementById('user').value.trim();
+        const p = document.getElementById('pass').value.trim();
+        const snap = await getDocs(collection(db, "users"));
+        let auth = false;
+        snap.forEach(d => { if(d.data().username === u && d.data().password === p) auth = true; });
+        if (auth) {
+            document.getElementById('loginScreen').style.display = 'none';
+            document.getElementById('app').style.display = 'grid';
+            loadData();
+        } else { alert("بيانات الدخول خاطئة!"); }
+    };
 
-                snapshot.forEach((doc) => {
-                    const data = doc.data();
-                    // نجمع كل قيم الحقول في المستند للبحث عن المستخدم وكلمة المرور
-                    const values = Object.values(data).map(v => String(v).trim());
-                    if (values.includes(u) && values.includes(p)) {
-                        isMatch = true;
-                    }
-                });
+    window.saveData = async () => {
+        const name = document.getElementById('cName').value;
+        const amount = parseFloat(document.getElementById('amount').value);
+        const type = document.getElementById('type').value;
+        if(!name || !amount) return alert("يرجى ملء البيانات");
+        await addDoc(collection(db, "finance"), { name, amount, type });
+        loadData();
+    };
 
-                if (isMatch) {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                } else {
-                    alert("بيانات خاطئة! يرجى التأكد من اسم المستخدم وكلمة المرور.");
-                }
-            } catch (e) {
-                alert("خطأ في الاتصال: " + e.message);
+    window.deleteRow = async (id) => {
+        await deleteDoc(doc(db, "finance", id));
+        loadData();
+    };
+
+    window.changePassword = async () => {
+        const newP = document.getElementById('newPass').value;
+        const u = document.getElementById('user').value.trim();
+        const snap = await getDocs(collection(db, "users"));
+        snap.forEach(async (d) => {
+            if (d.data().username === u) {
+                await updateDoc(doc(db, "users", d.id), { password: newP });
+                alert("تم تحديث كلمة المرور!");
             }
-        };
-    </script>
+        });
+    };
+
+    async function loadData() {
+        const snap = await getDocs(collection(db, "finance"));
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = "";
+        let inTotal = 0, outTotal = 0;
+        snap.forEach(d => {
+            const data = d.data();
+            if(data.type === 'in') inTotal += data.amount; else outTotal += data.amount;
+            tbody.innerHTML += `<tr><td>${data.name}</td><td>${data.amount}</td><td>${data.type}</td>
+                <td><button class="btn-del" onclick="deleteRow('${d.id}')">حذف</button></td></tr>`;
+        });
+        document.getElementById('totalIn').innerText = inTotal;
+        document.getElementById('totalOut').innerText = outTotal;
+        document.getElementById('balance').innerText = inTotal - outTotal;
+    }
+</script>
 </body>
 </html>
