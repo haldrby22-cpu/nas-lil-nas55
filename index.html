@@ -4,53 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>الناس للناس - لوحة الإدارة</title>
-    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
-        :root { --primary: #2c3e50; --secondary: #27ae60; --light: #f4f7f6; }
-        body { font-family: 'Tajawal', sans-serif; background: var(--light); margin: 0; padding: 20px; display: flex; justify-content: center; }
-        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
-        h1 { color: var(--primary); margin-bottom: 5px; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; }
-        .btn { width: 100%; background: var(--secondary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        #app { display: none; width: 100%; max-width: 500px; }
-        .admin-header { background: var(--primary); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
+        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: center; }
+        .card { background: white; padding: 20px; border-radius: 10px; max-width: 400px; margin: auto; }
+        input { width: 90%; padding: 10px; margin: 10px 0; }
+        .btn { padding: 10px 20px; cursor: pointer; }
+        #app { display: none; }
     </style>
 </head>
 <body>
 
     <div id="loginScreen" class="card">
-        <h1>الناس للناس</h1>
-        <p>لوحة تحكم الإدارة</p>
+        <h1>تسجيل الدخول</h1>
         <input type="text" id="user" placeholder="اسم المستخدم">
         <input type="password" id="pass" placeholder="كلمة المرور">
         <button class="btn" onclick="login()">دخول</button>
     </div>
 
     <div id="app" class="card">
-        <div class="admin-header">
-            <h3>الناس للناس</h3>
-            <small>رئيس مجلس الإدارة: الأستاذ/ شعبان عبد الفضيل</small>
-        </div>
-        
-        <div style="text-align: right;">
-            <h4>إضافة مستخدم جديد</h4>
-            <input type="text" id="newU" placeholder="اسم المستخدم">
-            <input type="password" id="newP" placeholder="كلمة المرور">
-            <button class="btn" onclick="saveUser()">حفظ المستخدم</button>
-            
-            <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
-            
-            <h4>إضافة حالة جديدة</h4>
-            <input type="text" id="taskInput" placeholder="اسم الحالة...">
-            <button class="btn" style="background:var(--primary);" onclick="addTask()">إضافة الحالة</button>
-        </div>
-        
-        <p style="margin-top:30px; font-size: 0.8em; color: #777;">تطوير: حسن الدربي</p>
+        <h1>تم الدخول بنجاح!</h1>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-        import { getFirestore, collection, addDoc, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
         const db = getFirestore(initializeApp({
             apiKey: "AIzaSyCdEd_xy-BBtxRm8CmIRyS1Ublr-Kp5fAQ",
@@ -65,37 +42,15 @@
             const u = document.getElementById('user').value.trim();
             const p = document.getElementById('pass').value.trim();
             
-            try {
-                // تم استخدام 'Password' بحرف كبير لتطابق قاعدة بياناتك
-                const q = query(collection(db, "users"), where("username", "==", u), where("Password", "==", p));
-                const snapshot = await getDocs(q);
-                
-                if (!snapshot.empty) {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                } else {
-                    alert("بيانات خاطئة! يرجى التأكد من اسم المستخدم وكلمة المرور.");
-                }
-            } catch (e) {
-                alert("حدث خطأ في الاتصال، تأكد من إعدادات قاعدة البيانات.");
-            }
-        };
-
-        window.saveUser = async () => {
-            const u = document.getElementById('newU').value.trim();
-            const p = document.getElementById('newP').value.trim();
-            if(u && p) {
-                // تم استخدام 'Password' بحرف كبير أيضاً هنا
-                await addDoc(collection(db, "users"), { username: u, Password: p });
-                alert("تم حفظ المستخدم بنجاح!");
-            }
-        };
-
-        window.addTask = () => {
-            const task = document.getElementById('taskInput').value.trim();
-            if(task) {
-                addDoc(collection(db, "tasks"), { name: task, status: "قيد الانتظار" });
-                alert("تمت إضافة الحالة بنجاح!");
+            // هنا الكود يبحث عن 'username' و 'password' (بحروف صغيرة)
+            const q = query(collection(db, "users"), where("username", "==", u), where("password", "==", p));
+            const snapshot = await getDocs(q);
+            
+            if (!snapshot.empty) {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('app').style.display = 'block';
+            } else {
+                alert("بيانات خاطئة! تأكد أن الحقول في Firebase هي username و password بحروف صغيرة.");
             }
         };
     </script>
