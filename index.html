@@ -2,14 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <title>فحص الاتصال</title>
-    <style>body{font-family:sans-serif; text-align:center; padding:50px;}</style>
+    <title>تشخيص الاتصال</title>
+    <style>body{font-family:sans-serif; text-align:center; padding:20px;}</style>
 </head>
 <body>
-    <div id="status">جاري الاتصال وفحص البيانات...</div>
+    <div id="status">جاري الفحص...</div>
     <input type="text" id="user" placeholder="اسم المستخدم">
     <input type="password" id="pass" placeholder="كلمة المرور">
-    <button onclick="login()">فحص الدخول</button>
+    <button onclick="check()">فحص</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -23,24 +23,25 @@
             appId: "1:134740212500:web:af95ff96b87bd6b2f66001"
         }));
 
-        window.login = async () => {
+        window.check = async () => {
             const u = document.getElementById('user').value.trim();
             const p = document.getElementById('pass').value.trim();
             const statusDiv = document.getElementById('status');
             
             try {
                 const snapshot = await getDocs(collection(db, "users"));
+                let results = "";
                 snapshot.forEach((doc) => {
                     const d = doc.data();
-                    const dbU = (d.username || d.Username || "").trim();
-                    const dbP = (d.password || d.Password || "").trim();
-                    
-                    statusDiv.innerHTML = `تم العثور على: <br>اسم المستخدم في القاعدة: "${dbU}"<br>كلمة المرور في القاعدة: "${dbP}"`;
+                    const dbU = (d.username || "").trim();
+                    const dbP = (d.password || "").trim();
+                    results += `القاعدة تحتوي: (${dbU}) و (${dbP}) <br>`;
                     
                     if (dbU === u && dbP === p) {
-                        statusDiv.innerHTML += "<br><h2 style='color:green'>تطابق تام! الدخول مسموح</h2>";
+                        results += "<h2 style='color:green'>تطابق تام!</h2>";
                     }
                 });
+                statusDiv.innerHTML = results || "المجموعة فارغة!";
             } catch (e) {
                 statusDiv.innerText = "خطأ: " + e.message;
             }
