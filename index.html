@@ -18,7 +18,6 @@
 </head>
 <body>
 
-    <!-- شاشة الدخول -->
     <div id="loginScreen" class="card">
         <h1>الناس للناس</h1>
         <p>لوحة تحكم الإدارة</p>
@@ -27,7 +26,6 @@
         <button class="btn" onclick="login()">دخول</button>
     </div>
 
-    <!-- لوحة التحكم -->
     <div id="app" class="card">
         <div class="admin-header">
             <h3>الناس للناس</h3>
@@ -63,14 +61,13 @@
             appId: "1:134740212500:web:af95ff96b87bd6b2f66001"
         }));
 
-        // دالة تسجيل الدخول
         window.login = async () => {
             const u = document.getElementById('user').value.trim();
             const p = document.getElementById('pass').value.trim();
             
             try {
-                // استعلام للتأكد من وجود المستخدم
-                const q = query(collection(db, "users"), where("username", "==", u), where("password", "==", p));
+                // تم استخدام 'Password' بحرف كبير لتطابق قاعدة بياناتك
+                const q = query(collection(db, "users"), where("username", "==", u), where("Password", "==", p));
                 const snapshot = await getDocs(q);
                 
                 if (!snapshot.empty) {
@@ -80,22 +77,20 @@
                     alert("بيانات خاطئة! يرجى التأكد من اسم المستخدم وكلمة المرور.");
                 }
             } catch (e) {
-                console.error(e);
                 alert("حدث خطأ في الاتصال، تأكد من إعدادات قاعدة البيانات.");
             }
         };
 
-        // دالة حفظ مستخدم جديد
         window.saveUser = async () => {
             const u = document.getElementById('newU').value.trim();
             const p = document.getElementById('newP').value.trim();
             if(u && p) {
-                await addDoc(collection(db, "users"), { username: u, password: p });
+                // تم استخدام 'Password' بحرف كبير أيضاً هنا
+                await addDoc(collection(db, "users"), { username: u, Password: p });
                 alert("تم حفظ المستخدم بنجاح!");
             }
         };
 
-        // دالة إضافة حالة
         window.addTask = () => {
             const task = document.getElementById('taskInput').value.trim();
             if(task) {
