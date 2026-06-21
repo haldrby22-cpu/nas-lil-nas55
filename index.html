@@ -3,18 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الناس للناس - الإدارة</title>
+    <title>الناس للناس - لوحة الإدارة</title>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root { --primary: #2c3e50; --secondary: #27ae60; --light: #f4f7f6; }
         body { font-family: 'Tajawal', sans-serif; background: var(--light); margin: 0; padding: 20px; display: flex; justify-content: center; }
         .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 100%; max-width: 450px; text-align: center; }
         h1 { color: var(--primary); margin-bottom: 5px; }
-        p { color: #7f8c8d; margin-bottom: 20px; }
-        input { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; transition: 0.3s; }
-        input:focus { border-color: var(--secondary); outline: none; }
-        .btn { width: 100%; background: var(--secondary); color: white; border: none; padding: 14px; border-radius: 12px; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .btn:hover { background: #219150; }
+        input { width: 100%; padding: 14px; margin: 10px 0; border: 2px solid #eee; border-radius: 12px; box-sizing: border-box; }
+        .btn { width: 100%; background: var(--secondary); color: white; border: none; padding: 14px; border-radius: 12px; font-weight: bold; cursor: pointer; }
         #app { display: none; width: 100%; max-width: 500px; }
         .admin-header { background: var(--primary); color: white; padding: 20px; border-radius: 15px; margin-bottom: 20px; }
     </style>
@@ -23,7 +20,7 @@
 
     <div id="loginScreen" class="card">
         <h1>الناس للناس</h1>
-        <p>مرحباً بك في لوحة الإدارة</p>
+        <p>لوحة تحكم الإدارة</p>
         <input type="text" id="user" placeholder="اسم المستخدم">
         <input type="password" id="pass" placeholder="كلمة المرور">
         <button class="btn" onclick="login()">دخول</button>
@@ -48,7 +45,7 @@
             <button class="btn" style="background:var(--primary);" onclick="addTask()">إضافة الحالة</button>
         </div>
         
-        <p style="margin-top:30px; font-size: 0.8em;">تطوير: حسن الدربي</p>
+        <p style="margin-top:30px; font-size: 0.8em; color: #777;">تطوير: حسن الدربي</p>
     </div>
 
     <script type="module">
@@ -65,24 +62,38 @@
         }));
 
         window.login = async () => {
-            const u = document.getElementById('user').value;
-            const p = document.getElementById('pass').value;
-            const q = query(collection(db, "users"), where("username", "==", u), where("password", "==", p));
-            const snapshot = await getDocs(q);
-            if (!snapshot.empty) {
-                document.getElementById('loginScreen').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-            } else { alert("بيانات خاطئة!"); }
+            const u = document.getElementById('user').value.trim();
+            const p = document.getElementById('pass').value.trim();
+            
+            try {
+                const q = query(collection(db, "users"), where("username", "==", u), where("password", "==", p));
+                const snapshot = await getDocs(q);
+                if (!snapshot.empty) {
+                    document.getElementById('loginScreen').style.display = 'none';
+                    document.getElementById('app').style.display = 'block';
+                } else {
+                    alert("بيانات خاطئة! يرجى التأكد من اسم المستخدم وكلمة المرور.");
+                }
+            } catch (e) {
+                alert("خطأ في الاتصال بقاعدة البيانات.");
+            }
         };
 
         window.saveUser = async () => {
-            await addDoc(collection(db, "users"), { username: document.getElementById('newU').value, password: document.getElementById('newP').value });
-            alert("تم حفظ المستخدم!");
+            const u = document.getElementById('newU').value.trim();
+            const p = document.getElementById('newP').value.trim();
+            if(u && p) {
+                await addDoc(collection(db, "users"), { username: u, password: p });
+                alert("تم حفظ المستخدم بنجاح!");
+            }
         };
 
         window.addTask = () => {
-            addDoc(collection(db, "tasks"), { name: document.getElementById('taskInput').value, status: "قيد الانتظار" });
-            alert("تمت الإضافة!");
+            const task = document.getElementById('taskInput').value;
+            if(task) {
+                addDoc(collection(db, "tasks"), { name: task, status: "قيد الانتظار" });
+                alert("تمت الإضافة!");
+            }
         };
     </script>
 </body>
