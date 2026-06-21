@@ -2,29 +2,14 @@
 <html lang="ar" dir="rtl">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>الناس للناس - لوحة الإدارة</title>
-    <style>
-        body { font-family: sans-serif; background: #f4f4f4; padding: 20px; text-align: center; }
-        .card { background: white; padding: 25px; border-radius: 15px; max-width: 400px; margin: auto; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        input { width: 90%; padding: 12px; margin: 10px 0; border: 1px solid #ccc; border-radius: 8px; }
-        .btn { padding: 12px 30px; background: #27ae60; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        #app { display: none; }
-    </style>
+    <title>فحص الاتصال</title>
+    <style>body{font-family:sans-serif; text-align:center; padding:50px;}</style>
 </head>
 <body>
-
-    <div id="loginScreen" class="card">
-        <h1>تسجيل الدخول</h1>
-        <input type="text" id="user" placeholder="اسم المستخدم">
-        <input type="password" id="pass" placeholder="كلمة المرور">
-        <button class="btn" onclick="login()">دخول</button>
-    </div>
-
-    <div id="app" class="card">
-        <h1>تم الدخول بنجاح!</h1>
-        <p>أهلاً بك في لوحة تحكم الناس للناس.</p>
-    </div>
+    <div id="status">جاري الاتصال وفحص البيانات...</div>
+    <input type="text" id="user" placeholder="اسم المستخدم">
+    <input type="password" id="pass" placeholder="كلمة المرور">
+    <button onclick="login()">فحص الدخول</button>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
@@ -32,7 +17,6 @@
 
         const db = getFirestore(initializeApp({
             apiKey: "AIzaSyCdEd_xy-BBtxRm8CmIRyS1Ublr-Kp5fAQ",
-            authDomain: "al-nas-lil-nas.firebaseapp.com",
             projectId: "al-nas-lil-nas",
             storageBucket: "al-nas-lil-nas.firebasestorage.app",
             messagingSenderId: "134740212500",
@@ -42,28 +26,23 @@
         window.login = async () => {
             const u = document.getElementById('user').value.trim();
             const p = document.getElementById('pass').value.trim();
+            const statusDiv = document.getElementById('status');
             
             try {
-                // جلب كل البيانات من مجموعة users
-                const querySnapshot = await getDocs(collection(db, "users"));
-                let found = false;
-
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    // مطابقة دقيقة
-                    if (data.username === u && data.password === p) {
-                        found = true;
+                const snapshot = await getDocs(collection(db, "users"));
+                snapshot.forEach((doc) => {
+                    const d = doc.data();
+                    const dbU = (d.username || d.Username || "").trim();
+                    const dbP = (d.password || d.Password || "").trim();
+                    
+                    statusDiv.innerHTML = `تم العثور على: <br>اسم المستخدم في القاعدة: "${dbU}"<br>كلمة المرور في القاعدة: "${dbP}"`;
+                    
+                    if (dbU === u && dbP === p) {
+                        statusDiv.innerHTML += "<br><h2 style='color:green'>تطابق تام! الدخول مسموح</h2>";
                     }
                 });
-
-                if (found) {
-                    document.getElementById('loginScreen').style.display = 'none';
-                    document.getElementById('app').style.display = 'block';
-                } else {
-                    alert("بيانات خاطئة! يرجى التأكد من اسم المستخدم وكلمة المرور.");
-                }
             } catch (e) {
-                alert("خطأ في الاتصال: " + e.message);
+                statusDiv.innerText = "خطأ: " + e.message;
             }
         };
     </script>
